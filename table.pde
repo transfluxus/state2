@@ -7,7 +7,7 @@ void setupTable() {
     TableRow row=null;
     for (int i=0; i < table.getRowCount (); i++) {
       row = table.getRow(i);
-      new Data(row.getInt("song"), row.getInt("time")).addToPlot();
+      new Data(row.getInt("song"), row.getInt("time"), row.getInt("age"), row.getInt("gender")).addToPlot();
     }
     experimentId_ = 1 + row.getInt("exp-id");
     personId_ = 1 + row.getInt("person-id");
@@ -20,6 +20,8 @@ void setupTable() {
 void initTable() {
   table.addColumn("exp-id");
   table.addColumn("person-id");  
+  table.addColumn("age");  
+  table.addColumn("gender");  
   table.addColumn("song");
   table.addColumn("time");
   table.addColumn("date");

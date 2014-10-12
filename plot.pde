@@ -32,7 +32,7 @@ class Diagram {
     plot.setFontColor(color(0));
   }
 
-  void add(int time) {
+  void add(int time, int gender) {
     int c=1; 
     if (entries.containsKey(time)) 
       c = entries.get(time)+1;
@@ -45,7 +45,6 @@ class Diagram {
     }
     plot.setPoints(pArray);
   }
-
 
   void display() {
     plot.beginDraw();
