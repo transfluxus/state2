@@ -24,7 +24,7 @@ long recTime;
 // sketch-states
 final int AGESCREEN = -1, GENDERSCREEN = -2, INFOSCREEN = 0, PLAYSCREEN = 1, RESULTSCREEN = 2, STATSSCREEN=3;
 // actuall state
-int screen = AGESCREEN;
+int screen = STATSSCREEN;
 int soundSelected = 0;
 boolean playing;
 PVector textPos;
@@ -33,9 +33,11 @@ int personId_ = 0;
 int experimentId_ = 0;
 PImage warningImg;
 
+ArrayList<Data> data = new ArrayList<Data>();
+
 // plots
-Diagram[] diagrams = new Diagram[4];
-TimeDiagram tDiagram; 
+Diagram[] diagrams = new Diagram[3];
+long sketchStart;
 // storage into csv
 Table table = new Table();
 
@@ -60,6 +62,7 @@ void setup() {
   setupDiagrams();
   //initTable();// add this line and the csv file will be cleared
   setupTable();
+  sketchStart = System.currentTimeMillis();
   if (useSerial)
     initSerial();
   // test fills
@@ -197,8 +200,9 @@ void done() {
 
 void store() {
   Data d = new Data(soundSelected, recTime, age, gender);
-  d.add();
+  d.add(true);
 }
+
 
 public class Data {
   int personId, experimentId;
@@ -217,15 +221,17 @@ public class Data {
     this.gender = gender;
   }
 
-  void add() {
+  void add(boolean toTable) {
+    data.add(this);
     addToPlot();
-    addToTable();
+    if (toTable)
+      addToTable();
   }
 
   void addToPlot() {
-    int timeS = (int)(time/1000);
-    diagrams[soundSel].add(timeS,gender);
-    tDiagram.add(new TimePlotData(soundSel, timeS, date));
+    //    int timeS = (int)(time/1000);
+    for(int i=0; i < 1;i++)
+    diagrams[i].add(this);
   }
 
   void addToTable() {

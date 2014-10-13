@@ -1,5 +1,3 @@
-
-
 // reads the csv file and adds the 
 void setupTable() {
   table =  loadTable("stats.csv", "header");
@@ -7,7 +5,7 @@ void setupTable() {
     TableRow row=null;
     for (int i=0; i < table.getRowCount (); i++) {
       row = table.getRow(i);
-      new Data(row.getInt("song"), row.getInt("time"), row.getInt("age"), row.getInt("gender")).addToPlot();
+      new Data(row.getInt("song"), row.getInt("time"), row.getInt("age"), row.getInt("gender")).add(false);
     }
     experimentId_ = 1 + row.getInt("exp-id");
     personId_ = 1 + row.getInt("person-id");

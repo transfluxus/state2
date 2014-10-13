@@ -1,15 +1,19 @@
+// plot
+// 1. time/count, 4 graphs (no gender,age)
+// 2. age/time(avg),  1 graph( munch gender & experiment)
+// 3. gender/time(avg), histogram: 4 categories for the 4 songs, each cat has 3 histograms (f,m,other)
+
+
 void setupDiagrams() {
   PVector diagramPos = new PVector();
   PVector  diagramSize = new PVector(width/2, height/2);
-  diagrams[0] = new Diagram(diagramPos.get(), diagramSize, "1");
+  diagrams[0] = new TimeCountDiagram(diagramPos.get(), diagramSize, "Time/Count");
   diagramPos.add(width/2, 0, 0);
-  diagrams[1] = new Diagram(diagramPos.get(), diagramSize, "2");
+  diagrams[1] = new DummyD(diagramPos.get(), diagramSize, "2");
   diagramPos= new PVector(0, height/2);
-  diagrams[2] = new Diagram(diagramPos.get(), diagramSize, "3");
+  diagrams[2] = new DummyD(diagramPos.get(), diagramSize, "3");
   diagramPos.add(width/2, 0, 0);
-  diagrams[3] = new Diagram(diagramPos.get(), diagramSize, "4");
-  //
-  tDiagram = new TimeDiagram(new PVector(20,20),new PVector(width-20,height-20),"");
+  //   diagrams[3] = new DummyD(diagramPos.get(), diagramSize, "4");
 }
 
 void displayDiagrams() {
@@ -18,32 +22,74 @@ void displayDiagrams() {
       d.display();
 }
 
-class Diagram {
+abstract class Diagram {
 
-  HashMap<Integer, Integer> entries = new HashMap<Integer, Integer>();
   GPlot plot;
 
-  Diagram(PVector p, PVector s, String t) {
-    plot = new GPlot(ap, p.x, p.y, s.x, s.y);
+  Diagram(PVector pos, PVector size, String title) {
+    plot = new GPlot(ap, pos.x, pos.y, size.x, size.y);
     plot.activatePointLabels();
-    plot.getTitle().setText(t);
-    plot.getXAxis().getAxisLabel().setText("Time");
-    plot.getYAxis().getAxisLabel().setText("Count");
+    plot.getTitle().setText(title);
+    //    plot.getXAxis().getAxisLabel().setText("Time");
+    //    plot.getYAxis().getAxisLabel().setText("Count");
     plot.setFontColor(color(0));
   }
 
-  void add(int time, int gender) {
-    int c=1; 
-    if (entries.containsKey(time)) 
-      c = entries.get(time)+1;
-    entries.put(time, c);
-    int sz = entries.size();
-    GPointsArray pArray = new GPointsArray(sz);
-    for (Integer k : entries.keySet ()) {
-      int val = entries.get(k);
-      pArray.add(new GPoint(k,val ,k+" sec.: "+val));
+  abstract  void add(Data data);
+
+  abstract  void display();
+}
+
+public class TimeCountDiagram extends Diagram {
+
+  //  ArrayList<HashMap<Integer, Integer>> graphs = new   ArrayList<HashMap<Integer, Integer>>();
+  GPointsArray[] points = new GPointsArray[4];
+  GLayer[] layers = new GLayer[4];
+  color[] clrs = {
+    color(255, 0, 0), color(255, 255, 0), color(0, 255, 0), color(0, 0, 255)
+  };
+
+
+  TimeCountDiagram(PVector pos, PVector size, String title) {
+    super(pos, size, title);
+    for (int i=0; i < 4; i++) {
+      //    graphs.add(new HashMap<Integer, Integer>());
+      points[i] = new GPointsArray();
+      //    points[i].add(50, 5);
+      layers[i] = plot.addLayer("exp "+i, points[i]);
+      plot.getLayer("exp "+i).setLineColor(clrs[i]);
+      //    layers[i].setLineColor(color(255, 0, 0));
     }
-    plot.setPoints(pArray);
+    //         
+
+    plot.getXAxis().getAxisLabel().setText("Time");
+    plot.getYAxis().getAxisLabel().setText("Amount");
+  }
+
+  void add(Data data) {
+    int time = (int)(data.time/1000);
+    int sel = data.soundSel;
+    println("adding "+sel);
+    GPointsArray array = points[sel];
+    for (int i=0; i <4; i++)
+      print(points[i].getNPoints() +" ");
+    println();
+    GPoint p = array.getPointWithX(time);
+    if (p!=null)
+      p.setY(p.getY()+1);
+    else 
+      array.add(time, 1 );
+    //    GLayer layer =  plot.getLayer("exp "+sel);
+    //    layer.setPoints(array );
+    plot.removeLayer("exp "+sel);
+    plot.addLayer("exp "+sel, array);
+    //    layer.getPointsRef().set(array);
+    /*    println(layer.getPointsRef().getNPoints());
+     if(sel==0);
+     for(int i=0; i < layer.getPointsRef().getNPoints();i++ )
+     println(layer.getPointsRef().get(i).getX()+","+layer.getPointsRef().get(i).getY()); */
+    //   plot.getLayer("layer 1").setLineColor(color(150, 150, 255));
+    //    plot.addLayer("exp 2", points1c);
   }
 
   void display() {
@@ -55,8 +101,24 @@ class Diagram {
     plot.drawTopAxis();
     plot.drawRightAxis();
     plot.drawTitle();
-    plot.getMainLayer().drawPoints();
+    plot.drawLines();
+    plot.drawPoints();
+    plot.drawFilledContours(GPlot.HORIZONTAL, 0.05);
     plot.drawLabels();
     plot.endDraw();
+    //    println("nag");
+  }
+}
+
+public class DummyD extends Diagram {
+
+  DummyD(PVector pos, PVector size, String title) {
+    super(pos, size, title);
+  }
+
+  void add(Data d) {
+  }
+
+  void display() {
   }
 }
