@@ -62,13 +62,16 @@ void setup() {
   setupDiagrams();
   //initTable();// add this line and the csv file will be cleared
   setupTable();
+  cleanOutLiners(30000,90000);
   sketchStart = System.currentTimeMillis();
   if (useSerial)
     initSerial();
   // test fills
-  //  Data d;
-  //  for (int i = 0; i < 200; i++)
-  //    d =new Data(0, (long)(60000+random(12000)));
+  Data d;
+  for (int i = 0; i < 200; i++) {
+    d =new Data((int)random(4), (long)(60000+random(-12000,12000)), 18, 0);
+    d.add( false);
+  }
 }
 
 void draw() {
@@ -230,8 +233,8 @@ public class Data {
 
   void addToPlot() {
     //    int timeS = (int)(time/1000);
-    for(int i=0; i < 1;i++)
-    diagrams[i].add(this);
+    for (int i=0; i < 2; i++)
+      diagrams[i].add(this);
   }
 
   void addToTable() {
